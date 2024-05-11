@@ -3,6 +3,8 @@ import websockets
 from requests import Request, Session
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 import json
+from dotenv import load_dotenv
+import os
 
 from utils import convertStringToNumber  # async def getBTCpriceUsd():
 
@@ -23,13 +25,14 @@ from utils import convertStringToNumber  # async def getBTCpriceUsd():
 #         return data["data"]["priceUsd"]
 #     except (ConnectionError, Timeout, TooManyRedirects) as e:
 #         print(e)
+bear = os.getenv("COINCAP_KEY")
 
 
 async def getCadRate():
     url = "https://api.coincap.io/v2/rates/canadian-dollar"
     headers = {
         "Accepts": "application/json",
-        "Authorization": "Bear 93e68853-017e-4931-b953-96eac7267310",
+        "Authorization": "Bear {bear}",
         "Accept-Encoding": "gzip, deflate, br",
     }
     session = Session()
@@ -97,7 +100,7 @@ async def get_BTC_History(interval, start, end):
     url = "https://api.coincap.io/v2/assets/bitcoin/history?interval={interval}?start={start}&end={end}"
     headers = {
         "Accepts": "application/json",
-        "Authorization": "Bear 93e68853-017e-4931-b953-96eac7267310",
+        "Authorization": "Bear {bear}",
         "Accept-Encoding": "gzip, deflate, br",
     }
     session = Session()
