@@ -1,4 +1,6 @@
 import asyncio
+import random
+import time
 import websockets
 from requests import Request, Session
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
@@ -49,7 +51,7 @@ async def getCadRate():
         print(e)
 
 
-def get_BTC_to_CAD(coin_id="bitcoin", currency="cad", days="1"):
+def get_BTC_to_CAD_History(coin_id="bitcoin", currency="cad", days="1"):
     url = f"https://api.coingecko.com/api/v3/coins/{coin_id}/ohlc?vs_currency={currency}&days={days}"
     headers = {"Accept": "application/json", "x-cg-demo-api-key": f"{key}"}
     session = Session()
@@ -108,6 +110,7 @@ def get_BTC_to_CAD(coin_id="bitcoin", currency="cad", days="1"):
             [1715639400000, 85903.0, 85995.0, 85897.0, 85897.0],
             [1715641200000, 85777.0, 85880.0, 85755.0, 85858.0],
         ]
+
         return data
     except Exception as e:
         print(e)
@@ -122,16 +125,20 @@ def get_live_BTC():  # supppose re-fetch every 30 mins, in this simulation, try 
         # response = session.get(url)
         # data = response.json()
 
+        # SIMULATION
         # Path to the JSON file
         file_path = "data.json"
 
         # Load JSON data from the file
         with open(file_path, "r") as file:
             data = json.load(file)
-        print(data)
-        return data
+        # print(data)
+        price = data["market_data"]["current_price"]["cad"]
+        while True:
+            price = price + random.choice([-1, 1]) * random.randint(100, 1000)
+            # Update to graph
+            print(price)
+            time.sleep(5)
+            # SIMULATION
     except Exception as e:
         print(e)
-
-
-get_live_BTC()

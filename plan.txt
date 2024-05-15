@@ -1,0 +1,3 @@
+transaction between 30Mins (fetch data every 30m)
+
+Showing graph not neccesary. 
