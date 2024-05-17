@@ -72,3 +72,18 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
+
+import pandas as pd
+from io import StringIO
+
+# Read the CSV data into a DataFrame
+df = pd.read_csv("ohlcv.csv")
+
+# Extract the desired columns
+extracted_df = df[["open_time", "open", "high", "low", "close", "volume", "close_time"]]
+
+# Save the extracted columns to a new CSV file
+extracted_df.to_csv("extracted_data.csv", index=False)
+
+print(extracted_df)
