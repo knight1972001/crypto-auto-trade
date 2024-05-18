@@ -1,12 +1,9 @@
-import mplfinance as mpf
+import time
+import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
-import datetime as dt
 import numpy as np
-
-# Enable interactive mode
-plt.ion()
+import mplfinance as mpf
+from datetime import datetime, timedelta
 
 
 # Initialize sample data with second-level frequency
@@ -27,26 +24,10 @@ def create_initial_data():
     return df
 
 
-# Initialize the DataFrame
-df = create_initial_data()
-
-# Create a figure and axes for the plot
-fig, (ax1, ax2) = plt.subplots(
-    2, 1, figsize=(10, 8), gridspec_kw={"height_ratios": [3, 1]}
-)
-ax1.set_title("Real-Time Candlestick Chart")
-
-# Plot initial data
-mpf.plot(df, type="candle", ax=ax1, volume=ax2)
-
-
-# Function to update the data and plot
-def update(frame):
-    global df
-
-    # Simulate new data for each second
+# Function to update the data
+def update_data(df):
     last_date = df.index[-1]
-    new_date = last_date + dt.timedelta(seconds=1)
+    new_date = last_date + timedelta(seconds=1)
     new_data = {
         "Open": np.random.uniform(100, 110),
         "High": np.random.uniform(110, 115),
@@ -55,37 +36,38 @@ def update(frame):
         "Volume": np.random.randint(1000, 2000),
     }
     new_df = pd.DataFrame(new_data, index=[new_date])
-
-    # Update the original DataFrame
     df = pd.concat([df, new_df])
-
-    # Get the current view limits
-    xlim = ax1.get_xlim()
-    ylim1 = ax1.get_ylim()
-    ylim2 = ax2.get_ylim()
-
-    # Clear the previous plots
-    ax1.clear()
-    ax2.clear()
-
-    # Plot the updated data
-    mpf.plot(df, type="candle", ax=ax1, volume=ax2)
-    ax1.set_title("Real-Time Candlestick Chart")
-
-    # Restore the previous view limits
-    ax1.set_xlim(xlim)
-    ax1.set_ylim(ylim1)
-    ax2.set_ylim(ylim2)
+    return df
 
 
-# Create animation
-ani = FuncAnimation(
-    fig, update, interval=5000, cache_frame_data=False
-)  # Update interval set to 5 seconds
+# Function to plot candlestick chart
+def plot_candlestick(df):
+    fig, ax = mpf.plot(df, type="candle", returnfig=True)
+    return fig
 
-# Display the plot
-plt.show()
 
-# Keep the plot open
-plt.ioff()
-plt.show()
+# Main Streamlit app
+def main():
+    st.title("Real-Time Candlestick Chart")
+    st.sidebar.markdown("### Controls")
+    update_interval = st.sidebar.slider(
+        "Update Interval (seconds)", min_value=1, max_value=10, value=5
+    )
+
+    # Initialize the DataFrame
+    df = create_initial_data()
+    # Create initial plot
+    fig = plot_candlestick(df)
+    st.pyplot(fig)
+
+    # Update plot in real-time
+    while True:
+        df = update_data(df)
+        fig = plot_candlestick(df)
+        st.pyplot(fig)
+        st.empty()  # Clear the previous plot to prevent overlapping
+        time.sleep(update_interval)
+
+
+if __name__ == "__main__":
+    main()
