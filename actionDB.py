@@ -1,7 +1,7 @@
 import asyncio
 import random
 import time
-import websockets
+from websockets.sync.client import connect
 from requests import Request, Session
 from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 import json
@@ -142,3 +142,17 @@ def get_live_BTC():  # supppose re-fetch every 30 mins, in this simulation, try 
             # SIMULATION
     except Exception as e:
         print(e)
+
+
+def connect_to_binance_ws():
+    uri = "wss://stream.binance.com:9443/ws/btcusdt@trade"
+    with connect(uri) as websocket:
+        while True:
+            # {"e":"trade","E":1716081545457,"s":"BTCUSDT","t":3603977792,"p":"66941.36000000","q":"0.00010000","b":27285066507,"a":27285061343,"T":1716081545457,"m":false,"M":true}
+            message = json.loads(websocket.recv())
+            # print(f'{message['p']} at {message['T']}')
+            print(message["p"])
+
+
+# def connect_to_binance_rest():
+#     uri =
